@@ -38,6 +38,16 @@ export declare class FunctionFlyClient {
     createSecret(body: VaultCreateSecretRequest): Promise<VaultSecretResponse>;
     updateSecret(id: string, body: VaultUpdateSecretRequest): Promise<VaultSecretResponse>;
     deleteSecret(id: string): Promise<void>;
+    listStateFabrics(params?: {
+        limit?: number;
+        offset?: number;
+    }): Promise<StateFabricListResponse>;
+    getStateFabric(id: string): Promise<StateFabricResponse>;
+    listStateFabricPipelines(fabricId: string, params?: {
+        limit?: number;
+        offset?: number;
+    }): Promise<StateFabricPipelineListResponse>;
+    executeStateFabricPipeline(fabricId: string, pipelineId: string, input: Record<string, unknown>): Promise<StateFabricPipelineExecutionResponse>;
 }
 export declare class MCPError extends Error {
     readonly code: string;
@@ -212,5 +222,56 @@ export interface VaultUpdateSecretRequest {
     name?: string;
     description?: string;
     scopes?: string[];
+}
+export interface StateFabricResponse {
+    id: string;
+    name: string;
+    description: string;
+    status: string;
+    type: string;
+    tenantId: string;
+    stores: StateFabricStore[];
+    pipelines: StateFabricPipeline[];
+    throughput: number;
+    latency: number;
+    lastUpdated: string;
+    createdAt: string;
+    updatedAt: string;
+    settings: Record<string, unknown>;
+}
+export interface StateFabricStore {
+    id: string;
+    name: string;
+    type: string;
+    status: string;
+    size: number;
+    maxSize: number;
+    region: string;
+    provider: string;
+}
+export interface StateFabricPipeline {
+    id: string;
+    fabricId: string;
+    name: string;
+    description: string;
+    status: string;
+}
+export interface StateFabricListResponse {
+    fabrics: StateFabricResponse[];
+    total: number;
+    limit: number;
+    offset: number;
+}
+export interface StateFabricPipelineListResponse {
+    pipelines: StateFabricPipeline[];
+    total: number;
+    limit: number;
+    offset: number;
+}
+export interface StateFabricPipelineExecutionResponse {
+    executionId: string;
+    status: string;
+    result?: unknown;
+    error?: string;
 }
 //# sourceMappingURL=client.d.ts.map

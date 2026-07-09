@@ -53,6 +53,20 @@ import {
   setSecret,
   deleteSecret,
 } from './tools/vault.js';
+import {
+  ListStateFabricsSchema,
+  ListStateFabricsArgs,
+  GetStateFabricSchema,
+  GetStateFabricArgs,
+  ListPipelinesSchema,
+  ListPipelinesArgs,
+  ExecutePipelineSchema,
+  ExecutePipelineArgs,
+  listStateFabrics,
+  getStateFabric,
+  listStateFabricPipelines,
+  executeStateFabricPipeline,
+} from './tools/statefabric.js';
 import { z } from 'zod';
 
 const config = loadConfig();
@@ -153,6 +167,34 @@ const TOOL_DEFINITIONS: ToolDefinition[] = [
     inputSchema: DeleteSecretSchema,
     handler: async (cli, args) => deleteSecret(cli, args as DeleteSecretArgs),
   },
+  {
+    name: 'statefabric_list_fabrics',
+    description:
+      'List all stateful workflows (StateFabrics) for the authenticated tenant.',
+    inputSchema: ListStateFabricsSchema,
+    handler: async (cli, args) => listStateFabrics(cli, args as ListStateFabricsArgs),
+  },
+  {
+    name: 'statefabric_get_fabric',
+    description:
+      'Get details of a specific StateFabric including its stores and pipelines.',
+    inputSchema: GetStateFabricSchema,
+    handler: async (cli, args) => getStateFabric(cli, args as GetStateFabricArgs),
+  },
+  {
+    name: 'statefabric_list_pipelines',
+    description:
+      'List all pipelines within a StateFabric.',
+    inputSchema: ListPipelinesSchema,
+    handler: async (cli, args) => listStateFabricPipelines(cli, args as ListPipelinesArgs),
+  },
+  {
+    name: 'statefabric_execute_pipeline',
+    description:
+      'Execute a pipeline within a StateFabric and return its result.',
+    inputSchema: ExecutePipelineSchema,
+    handler: async (cli, args) => executeStateFabricPipeline(cli, args as ExecutePipelineArgs),
+  },
 ];
 
 function buildToolSchema(def: ToolDefinition): Tool {
@@ -166,7 +208,7 @@ function buildToolSchema(def: ToolDefinition): Tool {
 const server = new Server(
   {
     name: 'functionfly-mcp-server',
-    version: '1.2.0',
+    version: '1.3.0',
   },
   {
     capabilities: {
@@ -250,7 +292,7 @@ server.setRequestHandler(InitializeRequestSchema, async (request) => {
     capabilities: { tools: {} },
     serverInfo: {
       name: 'functionfly-mcp-server',
-      version: '1.2.0',
+      version: '1.3.0',
     },
   };
 });

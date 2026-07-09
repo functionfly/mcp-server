@@ -22,7 +22,7 @@ export class FunctionFlyClient {
       timeout: this.timeout,
       headers: {
         'Content-Type': 'application/json',
-        'User-Agent': '@functionfly/mcp-server v1.2.0',
+        'User-Agent': '@functionfly/mcp-server v1.3.0',
       },
     });
 
@@ -184,6 +184,32 @@ export class FunctionFlyClient {
 
   async deleteSecret(id: string): Promise<void> {
     return this.executeWithRetry('delete', `/v1/vault/secrets/${id}`);
+  }
+
+  async listStateFabrics(params?: {
+    limit?: number;
+    offset?: number;
+  }): Promise<StateFabricListResponse> {
+    return this.executeWithRetry('get', '/v1/state-fabrics', { params });
+  }
+
+  async getStateFabric(id: string): Promise<StateFabricResponse> {
+    return this.executeWithRetry('get', `/v1/state-fabrics/${id}`);
+  }
+
+  async listStateFabricPipelines(fabricId: string, params?: {
+    limit?: number;
+    offset?: number;
+  }): Promise<StateFabricPipelineListResponse> {
+    return this.executeWithRetry('get', `/v1/state-fabrics/${fabricId}/pipelines`, { params });
+  }
+
+  async executeStateFabricPipeline(
+    fabricId: string,
+    pipelineId: string,
+    input: Record<string, unknown>
+  ): Promise<StateFabricPipelineExecutionResponse> {
+    return this.executeWithRetry('post', `/v1/state-fabrics/${fabricId}/pipelines/${pipelineId}/execute`, { input });
   }
 }
 
@@ -371,4 +397,61 @@ export interface VaultUpdateSecretRequest {
   name?: string;
   description?: string;
   scopes?: string[];
+}
+
+export interface StateFabricResponse {
+  id: string;
+  name: string;
+  description: string;
+  status: string;
+  type: string;
+  tenantId: string;
+  stores: StateFabricStore[];
+  pipelines: StateFabricPipeline[];
+  throughput: number;
+  latency: number;
+  lastUpdated: string;
+  createdAt: string;
+  updatedAt: string;
+  settings: Record<string, unknown>;
+}
+
+export interface StateFabricStore {
+  id: string;
+  name: string;
+  type: string;
+  status: string;
+  size: number;
+  maxSize: number;
+  region: string;
+  provider: string;
+}
+
+export interface StateFabricPipeline {
+  id: string;
+  fabricId: string;
+  name: string;
+  description: string;
+  status: string;
+}
+
+export interface StateFabricListResponse {
+  fabrics: StateFabricResponse[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+export interface StateFabricPipelineListResponse {
+  pipelines: StateFabricPipeline[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+export interface StateFabricPipelineExecutionResponse {
+  executionId: string;
+  status: string;
+  result?: unknown;
+  error?: string;
 }

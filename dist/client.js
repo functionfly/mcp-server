@@ -53,7 +53,7 @@ class FunctionFlyClient {
             timeout: this.timeout,
             headers: {
                 'Content-Type': 'application/json',
-                'User-Agent': '@functionfly/mcp-server v1.2.0',
+                'User-Agent': '@functionfly/mcp-server v1.3.0',
             },
         });
         this.client.interceptors.request.use((req) => {
@@ -155,6 +155,18 @@ class FunctionFlyClient {
     }
     async deleteSecret(id) {
         return this.executeWithRetry('delete', `/v1/vault/secrets/${id}`);
+    }
+    async listStateFabrics(params) {
+        return this.executeWithRetry('get', '/v1/state-fabrics', { params });
+    }
+    async getStateFabric(id) {
+        return this.executeWithRetry('get', `/v1/state-fabrics/${id}`);
+    }
+    async listStateFabricPipelines(fabricId, params) {
+        return this.executeWithRetry('get', `/v1/state-fabrics/${fabricId}/pipelines`, { params });
+    }
+    async executeStateFabricPipeline(fabricId, pipelineId, input) {
+        return this.executeWithRetry('post', `/v1/state-fabrics/${fabricId}/pipelines/${pipelineId}/execute`, { input });
     }
 }
 exports.FunctionFlyClient = FunctionFlyClient;

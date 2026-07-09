@@ -11,6 +11,7 @@ MCP server for FunctionFly — enables AI agents (Claude Desktop, Cursor, etc.) 
 - **Usage analytics** — View call counts and compute usage for your tenant
 - **Cost analytics** — View cost breakdown by function
 - **Vault secrets** — Zero-knowledge secret storage with client-side AES-256-GCM encryption
+- **StateFabric** — Stateful workflow execution — list fabrics, pipelines, and trigger pipeline runs
 
 ## Installation
 
@@ -231,6 +232,49 @@ Permanently delete a secret by ID.
 ```json
 {
   "id": "550e8400-e29b-41d4-a716-446655440000"
+}
+```
+
+### StateFabric Tools (Stateful Workflows)
+
+#### `statefabric_list_fabrics`
+List all stateful workflows (StateFabrics) for your tenant.
+
+```json
+{
+  "limit": 20,
+  "offset": 0
+}
+```
+
+#### `statefabric_get_fabric`
+Get details of a specific StateFabric.
+
+```json
+{
+  "id": "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+}
+```
+
+#### `statefabric_list_pipelines`
+List all pipelines within a StateFabric.
+
+```json
+{
+  "fabricId": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+  "limit": 20,
+  "offset": 0
+}
+```
+
+#### `statefabric_execute_pipeline`
+Execute a pipeline within a StateFabric and return its result.
+
+```json
+{
+  "fabricId": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+  "pipelineId": "a1b2c3d4-5678-90ab-cdef-1234567890ab",
+  "input": { "key": "value" }
 }
 ```
 
