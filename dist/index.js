@@ -9,6 +9,7 @@ const client_js_1 = require("./client.js");
 const registry_js_1 = require("./tools/registry.js");
 const agents_js_1 = require("./tools/agents.js");
 const analytics_js_1 = require("./tools/analytics.js");
+const vault_js_1 = require("./tools/vault.js");
 const config = (0, config_js_1.loadConfig)();
 const client = new client_js_1.FunctionFlyClient();
 const TOOL_DEFINITIONS = [
@@ -60,6 +61,30 @@ const TOOL_DEFINITIONS = [
         inputSchema: analytics_js_1.GetCostsSchema,
         handler: async (cli, args) => (0, analytics_js_1.getCosts)(cli, args),
     },
+    {
+        name: 'vault_list_secrets',
+        description: 'List secrets in the vault. Returns secret metadata (id, name, type, namespace, timestamps) without encrypted values. Requires Pro+ plan for namespaces.',
+        inputSchema: vault_js_1.ListSecretsSchema,
+        handler: async (cli, args) => (0, vault_js_1.listSecrets)(cli, args),
+    },
+    {
+        name: 'vault_get_secret',
+        description: 'Get a secret by ID and decrypt it. Uses VAULT_PASSPHRASE env var (or passphrase argument) to decrypt client-side. Returns decrypted value. Zero-knowledge: the server never sees the plaintext.',
+        inputSchema: vault_js_1.GetSecretSchema,
+        handler: async (cli, args) => (0, vault_js_1.getSecret)(cli, args),
+    },
+    {
+        name: 'vault_set_secret',
+        description: 'Create a new secret in the vault. The secret value is encrypted client-side using VAULT_PASSPHRASE env var (or passphrase argument) with AES-256-GCM + PBKDF2 before being sent. Zero-knowledge: the server never sees the plaintext.',
+        inputSchema: vault_js_1.SetSecretSchema,
+        handler: async (cli, args) => (0, vault_js_1.setSecret)(cli, args),
+    },
+    {
+        name: 'vault_delete_secret',
+        description: 'Delete a secret from the vault by ID. This action is irreversible.',
+        inputSchema: vault_js_1.DeleteSecretSchema,
+        handler: async (cli, args) => (0, vault_js_1.deleteSecret)(cli, args),
+    },
 ];
 function buildToolSchema(def) {
     return {
@@ -70,7 +95,7 @@ function buildToolSchema(def) {
 }
 const server = new index_js_1.Server({
     name: 'functionfly-mcp-server',
-    version: '1.1.0',
+    version: '1.2.0',
 }, {
     capabilities: {
         tools: {},
@@ -147,7 +172,7 @@ server.setRequestHandler(types_js_1.InitializeRequestSchema, async (request) => 
         capabilities: { tools: {} },
         serverInfo: {
             name: 'functionfly-mcp-server',
-            version: '1.1.0',
+            version: '1.2.0',
         },
     };
 });

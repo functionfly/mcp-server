@@ -29,6 +29,15 @@ export declare class FunctionFlyClient {
         groupBy?: string;
     }): Promise<CostsResponse>;
     publishFunction(author: string, name: string, version: string, manifest: FunctionManifest, source?: FunctionSourceInput, changelog?: ChangelogInput): Promise<PublishFunctionResponse>;
+    listSecrets(params?: {
+        namespace?: string;
+        limit?: number;
+        offset?: number;
+    }): Promise<VaultListSecretsResponse>;
+    getSecret(id: string): Promise<VaultSecretResponse>;
+    createSecret(body: VaultCreateSecretRequest): Promise<VaultSecretResponse>;
+    updateSecret(id: string, body: VaultUpdateSecretRequest): Promise<VaultSecretResponse>;
+    deleteSecret(id: string): Promise<void>;
 }
 export declare class MCPError extends Error {
     readonly code: string;
@@ -158,5 +167,50 @@ export interface PublishFunctionResponse {
     version: string;
     message?: string;
     verification_status?: string;
+}
+export interface VaultEncryptedPayload {
+    ciphertext: string;
+    iv: string;
+    salt: string;
+    tag: string;
+    key_version: number;
+}
+export interface VaultSecretMetadata {
+    id: string;
+    name: string;
+    description?: string;
+    secret_type: string;
+    scopes?: string[];
+    metadata?: Record<string, unknown>;
+    namespace: string;
+    last_accessed_at?: string;
+    access_count: number;
+    created_at: string;
+    updated_at: string;
+    current_version?: number;
+    last_modified_at?: string;
+}
+export interface VaultSecretResponse extends VaultSecretMetadata {
+    encrypted_data: VaultEncryptedPayload;
+}
+export interface VaultListSecretsResponse {
+    secrets: VaultSecretMetadata[];
+    total: number;
+    limit: number;
+    offset: number;
+}
+export interface VaultCreateSecretRequest {
+    name: string;
+    description?: string;
+    secret_type: string;
+    encrypted_data: VaultEncryptedPayload;
+    scopes?: string[];
+    metadata?: Record<string, unknown>;
+    namespace?: string;
+}
+export interface VaultUpdateSecretRequest {
+    name?: string;
+    description?: string;
+    scopes?: string[];
 }
 //# sourceMappingURL=client.d.ts.map

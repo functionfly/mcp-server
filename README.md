@@ -10,6 +10,7 @@ MCP server for FunctionFly — enables AI agents (Claude Desktop, Cursor, etc.) 
 - **Agent marketplace** — Search and execute AI agents
 - **Usage analytics** — View call counts and compute usage for your tenant
 - **Cost analytics** — View cost breakdown by function
+- **Vault secrets** — Zero-knowledge secret storage with client-side AES-256-GCM encryption
 
 ## Installation
 
@@ -57,6 +58,7 @@ Add to your Cursor MCP settings (`Settings → MCP → Add new server`):
 | `FUNCTIONFLY_API_URL` | No | `https://api.functionfly.com` | API base URL |
 | `FUNCTIONFLY_EXECUTION_TIMEOUT_MS` | No | `30000` | Execution timeout (ms, max 300000) |
 | `LOG_LEVEL` | No | `info` | Log level: `debug`, `info`, `warn`, `error` |
+| `VAULT_PASSPHRASE` | For vault tools | — | Passphrase for AES-256-GCM vault encryption/decryption |
 
 ## Available Tools
 
@@ -183,6 +185,52 @@ Get cost breakdown for your tenant.
   "startDate": "2024-06-01",
   "endDate": "2024-06-30",
   "groupBy": "function"
+}
+```
+
+### Vault Tools (Zero-Knowledge)
+
+> **Zero-knowledge architecture**: Secrets are encrypted client-side before leaving your machine. The FunctionFly server stores only ciphertext. Set `VAULT_PASSPHRASE` to control encryption.
+
+#### `vault_list_secrets`
+List secrets in your vault (metadata only, no values).
+
+```json
+{
+  "namespace": "production",
+  "limit": 20,
+  "offset": 0
+}
+```
+
+#### `vault_get_secret`
+Get and decrypt a secret. Uses `VAULT_PASSPHRASE` env var for decryption.
+
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000"
+}
+```
+
+#### `vault_set_secret`
+Create a new secret. The value is encrypted client-side before upload. Uses `VAULT_PASSPHRASE` env var.
+
+```json
+{
+  "name": "github-api-key",
+  "value": "ghp_xxxx",
+  "secret_type": "api_key",
+  "description": "GitHub personal access token",
+  "namespace": "production"
+}
+```
+
+#### `vault_delete_secret`
+Permanently delete a secret by ID.
+
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000"
 }
 ```
 

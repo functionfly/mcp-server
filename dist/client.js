@@ -53,7 +53,7 @@ class FunctionFlyClient {
             timeout: this.timeout,
             headers: {
                 'Content-Type': 'application/json',
-                'User-Agent': '@functionfly/mcp-server v1.1.0',
+                'User-Agent': '@functionfly/mcp-server v1.2.0',
             },
         });
         this.client.interceptors.request.use((req) => {
@@ -140,6 +140,21 @@ class FunctionFlyClient {
             body.changelog = changelog;
         }
         return this.executeWithRetry('post', '/v1/registry/publish', body);
+    }
+    async listSecrets(params) {
+        return this.executeWithRetry('get', '/v1/vault/secrets', { params });
+    }
+    async getSecret(id) {
+        return this.executeWithRetry('get', `/v1/vault/secrets/${id}`);
+    }
+    async createSecret(body) {
+        return this.executeWithRetry('post', '/v1/vault/secrets', body);
+    }
+    async updateSecret(id, body) {
+        return this.executeWithRetry('patch', `/v1/vault/secrets/${id}`, body);
+    }
+    async deleteSecret(id) {
+        return this.executeWithRetry('delete', `/v1/vault/secrets/${id}`);
     }
 }
 exports.FunctionFlyClient = FunctionFlyClient;

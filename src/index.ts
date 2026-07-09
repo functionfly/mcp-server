@@ -39,6 +39,20 @@ import {
   getUsage,
   getCosts,
 } from './tools/analytics.js';
+import {
+  ListSecretsSchema,
+  ListSecretsArgs,
+  GetSecretSchema,
+  GetSecretArgs,
+  SetSecretSchema,
+  SetSecretArgs,
+  DeleteSecretSchema,
+  DeleteSecretArgs,
+  listSecrets,
+  getSecret,
+  setSecret,
+  deleteSecret,
+} from './tools/vault.js';
 import { z } from 'zod';
 
 const config = loadConfig();
@@ -111,6 +125,34 @@ const TOOL_DEFINITIONS: ToolDefinition[] = [
     inputSchema: GetCostsSchema,
     handler: async (cli, args) => getCosts(cli, args as GetCostsArgs),
   },
+  {
+    name: 'vault_list_secrets',
+    description:
+      'List secrets in the vault. Returns secret metadata (id, name, type, namespace, timestamps) without encrypted values. Requires Pro+ plan for namespaces.',
+    inputSchema: ListSecretsSchema,
+    handler: async (cli, args) => listSecrets(cli, args as ListSecretsArgs),
+  },
+  {
+    name: 'vault_get_secret',
+    description:
+      'Get a secret by ID and decrypt it. Uses VAULT_PASSPHRASE env var (or passphrase argument) to decrypt client-side. Returns decrypted value. Zero-knowledge: the server never sees the plaintext.',
+    inputSchema: GetSecretSchema,
+    handler: async (cli, args) => getSecret(cli, args as GetSecretArgs),
+  },
+  {
+    name: 'vault_set_secret',
+    description:
+      'Create a new secret in the vault. The secret value is encrypted client-side using VAULT_PASSPHRASE env var (or passphrase argument) with AES-256-GCM + PBKDF2 before being sent. Zero-knowledge: the server never sees the plaintext.',
+    inputSchema: SetSecretSchema,
+    handler: async (cli, args) => setSecret(cli, args as SetSecretArgs),
+  },
+  {
+    name: 'vault_delete_secret',
+    description:
+      'Delete a secret from the vault by ID. This action is irreversible.',
+    inputSchema: DeleteSecretSchema,
+    handler: async (cli, args) => deleteSecret(cli, args as DeleteSecretArgs),
+  },
 ];
 
 function buildToolSchema(def: ToolDefinition): Tool {
@@ -124,7 +166,7 @@ function buildToolSchema(def: ToolDefinition): Tool {
 const server = new Server(
   {
     name: 'functionfly-mcp-server',
-    version: '1.1.0',
+    version: '1.2.0',
   },
   {
     capabilities: {
@@ -208,7 +250,7 @@ server.setRequestHandler(InitializeRequestSchema, async (request) => {
     capabilities: { tools: {} },
     serverInfo: {
       name: 'functionfly-mcp-server',
-      version: '1.1.0',
+      version: '1.2.0',
     },
   };
 });

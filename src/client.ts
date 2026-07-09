@@ -22,7 +22,7 @@ export class FunctionFlyClient {
       timeout: this.timeout,
       headers: {
         'Content-Type': 'application/json',
-        'User-Agent': '@functionfly/mcp-server v1.1.0',
+        'User-Agent': '@functionfly/mcp-server v1.2.0',
       },
     });
 
@@ -33,7 +33,7 @@ export class FunctionFlyClient {
   }
 
   private async executeWithRetry<T>(
-    method: 'get' | 'post' | 'delete',
+    method: 'get' | 'post' | 'delete' | 'patch',
     path: string,
     data?: unknown,
     attempt = 1
@@ -160,6 +160,30 @@ export class FunctionFlyClient {
       body.changelog = changelog;
     }
     return this.executeWithRetry('post', '/v1/registry/publish', body);
+  }
+
+  async listSecrets(params?: {
+    namespace?: string;
+    limit?: number;
+    offset?: number;
+  }): Promise<VaultListSecretsResponse> {
+    return this.executeWithRetry('get', '/v1/vault/secrets', { params });
+  }
+
+  async getSecret(id: string): Promise<VaultSecretResponse> {
+    return this.executeWithRetry('get', `/v1/vault/secrets/${id}`);
+  }
+
+  async createSecret(body: VaultCreateSecretRequest): Promise<VaultSecretResponse> {
+    return this.executeWithRetry('post', '/v1/vault/secrets', body);
+  }
+
+  async updateSecret(id: string, body: VaultUpdateSecretRequest): Promise<VaultSecretResponse> {
+    return this.executeWithRetry('patch', `/v1/vault/secrets/${id}`, body);
+  }
+
+  async deleteSecret(id: string): Promise<void> {
+    return this.executeWithRetry('delete', `/v1/vault/secrets/${id}`);
   }
 }
 
@@ -296,4 +320,55 @@ export interface PublishFunctionResponse {
   version: string;
   message?: string;
   verification_status?: string;
+}
+
+export interface VaultEncryptedPayload {
+  ciphertext: string;
+  iv: string;
+  salt: string;
+  tag: string;
+  key_version: number;
+}
+
+export interface VaultSecretMetadata {
+  id: string;
+  name: string;
+  description?: string;
+  secret_type: string;
+  scopes?: string[];
+  metadata?: Record<string, unknown>;
+  namespace: string;
+  last_accessed_at?: string;
+  access_count: number;
+  created_at: string;
+  updated_at: string;
+  current_version?: number;
+  last_modified_at?: string;
+}
+
+export interface VaultSecretResponse extends VaultSecretMetadata {
+  encrypted_data: VaultEncryptedPayload;
+}
+
+export interface VaultListSecretsResponse {
+  secrets: VaultSecretMetadata[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+export interface VaultCreateSecretRequest {
+  name: string;
+  description?: string;
+  secret_type: string;
+  encrypted_data: VaultEncryptedPayload;
+  scopes?: string[];
+  metadata?: Record<string, unknown>;
+  namespace?: string;
+}
+
+export interface VaultUpdateSecretRequest {
+  name?: string;
+  description?: string;
+  scopes?: string[];
 }
