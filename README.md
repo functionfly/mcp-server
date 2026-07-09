@@ -6,6 +6,7 @@ MCP server for FunctionFly — enables AI agents (Claude Desktop, Cursor, etc.) 
 
 - **Registry search** — Find functions by name, author, runtime, or keyword
 - **Function execution** — Execute any public or private function with JSON input
+- **Function publishing** — Publish new functions or versions with source code and manifest
 - **Agent marketplace** — Search and execute AI agents
 - **Usage analytics** — View call counts and compute usage for your tenant
 - **Cost analytics** — View cost breakdown by function
@@ -92,6 +93,49 @@ Execute a function and get its result.
   "name": "resize-image",
   "input": { "url": "https://example.com/image.jpg", "width": 800 },
   "version": "1.2.3"
+}
+```
+
+#### `registry_publish_function`
+Publish a new function or version to the registry. Requires authentication.
+
+```json
+{
+  "author": "acme",
+  "name": "resize-image",
+  "version": "1.2.3",
+  "manifest": {
+    "runtime": "python3.12",
+    "description": "Resize an image to specified dimensions",
+    "timeout_ms": 10000,
+    "memory_mb": 256,
+    "public": true,
+    "deterministic": false,
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "url": { "type": "string", "description": "Image URL" },
+        "width": { "type": "integer", "description": "Target width" }
+      },
+      "required": ["url"]
+    }
+  },
+  "source": {
+    "code": "import requests\nfrom PIL import Image\n...\nreturn {'url': output_url}",
+    "runtime": "python3.12"
+  },
+  "changelog": {
+    "category": "feature",
+    "title": "Add width-only resize support",
+    "description": "Image can now be resized by width alone while preserving aspect ratio",
+    "changes": [
+      {
+        "component": "input schema",
+        "field": "height",
+        "description": "Made height optional"
+      }
+    ]
+  }
 }
 ```
 

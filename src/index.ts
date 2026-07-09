@@ -16,9 +16,12 @@ import {
   GetFunctionArgs,
   ExecuteFunctionSchema,
   ExecuteFunctionArgs,
+  PublishFunctionSchema,
+  PublishFunctionArgs,
   searchFunctions,
   getFunction,
   executeFunction,
+  publishFunction,
 } from './tools/registry.js';
 import {
   SearchAgentsSchema,
@@ -74,6 +77,13 @@ const TOOL_DEFINITIONS: ToolDefinition[] = [
     handler: async (cli, args) => executeFunction(cli, args as ExecuteFunctionArgs),
   },
   {
+    name: 'registry_publish_function',
+    description:
+      'Publish a new function or function version to the FunctionFly registry. Requires authentication. Supports source code upload, manifest configuration, and optional changelog.',
+    inputSchema: PublishFunctionSchema,
+    handler: async (cli, args) => publishFunction(cli, args as PublishFunctionArgs),
+  },
+  {
     name: 'agents_search',
     description:
       'Search the FunctionFly agent marketplace. Returns agents with ratings, pricing, and download counts.',
@@ -114,7 +124,7 @@ function buildToolSchema(def: ToolDefinition): Tool {
 const server = new Server(
   {
     name: 'functionfly-mcp-server',
-    version: '1.0.0',
+    version: '1.1.0',
   },
   {
     capabilities: {
@@ -198,7 +208,7 @@ server.setRequestHandler(InitializeRequestSchema, async (request) => {
     capabilities: { tools: {} },
     serverInfo: {
       name: 'functionfly-mcp-server',
-      version: '1.0.0',
+      version: '1.1.0',
     },
   };
 });

@@ -1,6 +1,6 @@
 {
   "name": "@functionfly/mcp-server",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "MCP server for FunctionFly — execute functions, search registries, and manage agents from any MCP client",
   "license": "MIT",
   "author": "FunctionFly <dev@functionfly.com>",

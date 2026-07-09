@@ -28,6 +28,7 @@ export declare class FunctionFlyClient {
         endDate?: string;
         groupBy?: string;
     }): Promise<CostsResponse>;
+    publishFunction(author: string, name: string, version: string, manifest: FunctionManifest, source?: FunctionSourceInput, changelog?: ChangelogInput): Promise<PublishFunctionResponse>;
 }
 export declare class MCPError extends Error {
     readonly code: string;
@@ -106,5 +107,56 @@ export interface CostsResponse {
         costUSD: number;
         calls: number;
     }>;
+}
+export interface FunctionManifest {
+    runtime: string;
+    entry?: string;
+    public?: boolean;
+    deterministic?: boolean;
+    cache_ttl?: number;
+    timeout_ms?: number;
+    memory_mb?: number;
+    description?: string;
+    dependencies?: Record<string, string>;
+    env?: Record<string, string>;
+    input_schema?: Record<string, unknown>;
+    output_schema?: Record<string, unknown>;
+    idempotent?: boolean;
+    side_effects?: string;
+    capabilities?: string[];
+    main_file?: string;
+    type_check?: boolean;
+    ts_config?: string;
+    strict_mode?: boolean;
+    skip_type_check?: boolean;
+    include_packages?: boolean;
+    package_cache?: string;
+}
+export interface FunctionSourceInput {
+    code: string;
+    files?: Record<string, string>;
+    runtime: string;
+    wasm_binary?: string;
+    readme?: string;
+}
+export interface ChangelogChangeInput {
+    component: string;
+    field: string;
+    before?: unknown;
+    after?: unknown;
+    description: string;
+}
+export interface ChangelogInput {
+    category: string;
+    title: string;
+    description: string;
+    changes?: ChangelogChangeInput[];
+}
+export interface PublishFunctionResponse {
+    ok: boolean;
+    function: string;
+    version: string;
+    message?: string;
+    verification_status?: string;
 }
 //# sourceMappingURL=client.d.ts.map

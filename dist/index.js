@@ -31,6 +31,12 @@ const TOOL_DEFINITIONS = [
         handler: async (cli, args) => (0, registry_js_1.executeFunction)(cli, args),
     },
     {
+        name: 'registry_publish_function',
+        description: 'Publish a new function or function version to the FunctionFly registry. Requires authentication. Supports source code upload, manifest configuration, and optional changelog.',
+        inputSchema: registry_js_1.PublishFunctionSchema,
+        handler: async (cli, args) => (0, registry_js_1.publishFunction)(cli, args),
+    },
+    {
         name: 'agents_search',
         description: 'Search the FunctionFly agent marketplace. Returns agents with ratings, pricing, and download counts.',
         inputSchema: agents_js_1.SearchAgentsSchema,
@@ -64,7 +70,7 @@ function buildToolSchema(def) {
 }
 const server = new index_js_1.Server({
     name: 'functionfly-mcp-server',
-    version: '1.0.0',
+    version: '1.1.0',
 }, {
     capabilities: {
         tools: {},
@@ -141,7 +147,7 @@ server.setRequestHandler(types_js_1.InitializeRequestSchema, async (request) => 
         capabilities: { tools: {} },
         serverInfo: {
             name: 'functionfly-mcp-server',
-            version: '1.0.0',
+            version: '1.1.0',
         },
     };
 });

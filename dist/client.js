@@ -53,7 +53,7 @@ class FunctionFlyClient {
             timeout: this.timeout,
             headers: {
                 'Content-Type': 'application/json',
-                'User-Agent': '@functionfly/mcp-server v1.0.0',
+                'User-Agent': '@functionfly/mcp-server v1.1.0',
             },
         });
         this.client.interceptors.request.use((req) => {
@@ -125,6 +125,21 @@ class FunctionFlyClient {
     }
     async getCosts(params) {
         return this.executeWithRetry('get', '/v1/analytics/costs', { params });
+    }
+    async publishFunction(author, name, version, manifest, source, changelog) {
+        const body = {
+            author,
+            name,
+            version,
+            manifest,
+        };
+        if (source) {
+            body.source = source;
+        }
+        if (changelog) {
+            body.changelog = changelog;
+        }
+        return this.executeWithRetry('post', '/v1/registry/publish', body);
     }
 }
 exports.FunctionFlyClient = FunctionFlyClient;

@@ -22,7 +22,7 @@ export class FunctionFlyClient {
       timeout: this.timeout,
       headers: {
         'Content-Type': 'application/json',
-        'User-Agent': '@functionfly/mcp-server v1.0.0',
+        'User-Agent': '@functionfly/mcp-server v1.1.0',
       },
     });
 
@@ -138,6 +138,29 @@ export class FunctionFlyClient {
   }): Promise<CostsResponse> {
     return this.executeWithRetry('get', '/v1/analytics/costs', { params });
   }
+
+  async publishFunction(
+    author: string,
+    name: string,
+    version: string,
+    manifest: FunctionManifest,
+    source?: FunctionSourceInput,
+    changelog?: ChangelogInput
+  ): Promise<PublishFunctionResponse> {
+    const body: Record<string, unknown> = {
+      author,
+      name,
+      version,
+      manifest,
+    };
+    if (source) {
+      body.source = source;
+    }
+    if (changelog) {
+      body.changelog = changelog;
+    }
+    return this.executeWithRetry('post', '/v1/registry/publish', body);
+  }
 }
 
 export class MCPError extends Error {
@@ -217,4 +240,60 @@ export interface CostsResponse {
   totalUSD: number;
   period: { start: string; end: string };
   byFunction: Record<string, { costUSD: number; calls: number }>;
+}
+
+export interface FunctionManifest {
+  runtime: string;
+  entry?: string;
+  public?: boolean;
+  deterministic?: boolean;
+  cache_ttl?: number;
+  timeout_ms?: number;
+  memory_mb?: number;
+  description?: string;
+  dependencies?: Record<string, string>;
+  env?: Record<string, string>;
+  input_schema?: Record<string, unknown>;
+  output_schema?: Record<string, unknown>;
+  idempotent?: boolean;
+  side_effects?: string;
+  capabilities?: string[];
+  main_file?: string;
+  type_check?: boolean;
+  ts_config?: string;
+  strict_mode?: boolean;
+  skip_type_check?: boolean;
+  include_packages?: boolean;
+  package_cache?: string;
+}
+
+export interface FunctionSourceInput {
+  code: string;
+  files?: Record<string, string>;
+  runtime: string;
+  wasm_binary?: string;
+  readme?: string;
+}
+
+export interface ChangelogChangeInput {
+  component: string;
+  field: string;
+  before?: unknown;
+  after?: unknown;
+  description: string;
+}
+
+export interface ChangelogInput {
+  category: string;
+  title: string;
+  description: string;
+  changes?: ChangelogChangeInput[];
+}
+
+export interface PublishFunctionResponse {
+  ok: boolean;
+  function: string;
+  version: string;
+  message?: string;
+  verification_status?: string;
 }
