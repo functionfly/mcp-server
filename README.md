@@ -1,4 +1,4 @@
-# @functionfly/mcp-server
+# @functionflycom/mcp-server
 
 MCP server for FunctionFly — enables AI agents (Claude Desktop, Cursor, etc.) to interact with the FunctionFly platform directly.
 
@@ -24,7 +24,7 @@ Add to your `claude_desktop_config.json`:
   "mcpServers": {
     "functionfly": {
       "command": "npx",
-      "args": ["-y", "@functionfly/mcp-server"],
+      "args": ["-y", "@functionflycom/mcp-server"],
       "env": {
         "FUNCTIONFLY_API_KEY": "ffp_your_api_key_here"
       }
@@ -42,7 +42,7 @@ Add to your Cursor MCP settings (`Settings → MCP → Add new server`):
   "mcpServers": {
     "functionfly": {
       "command": "npx",
-      "args": ["-y", "@functionfly/mcp-server"],
+      "args": ["-y", "@functionflycom/mcp-server"],
       "env": {
         "FUNCTIONFLY_API_KEY": "ffp_your_api_key_here"
       }
